@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate": "npx sequelize db:migrate",
+    "seed": "npx sequelize db:seed:all"
   },
   "repository": {
     "type": "git",
@@ -22,5 +25,8 @@
     "mysql2": "^2.3.3",
     "sequelize": "^6.28.0",
     "sequelize-cli": "^6.5.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }
