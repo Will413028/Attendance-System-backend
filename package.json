@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha tests --exit --recursive --timeout 10000",
     "migrate": "npx sequelize db:migrate",
     "seed": "npx sequelize db:seed:all"
   },
@@ -27,6 +27,12 @@
     "sequelize-cli": "^6.5.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "nodemon": "^2.0.20",
+    "sequelize-test-helpers": "^1.4.3",
+    "sinon": "^15.0.1",
+    "sinon-chai": "^3.7.0",
+    "supertest": "^6.3.3"
   }
 }
