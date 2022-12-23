@@ -1,0 +1,9 @@
+version: '3.5'
+
+services:
+  attendance-system-backend:
+    image: will413028/attendance-system-backend:latest
+    restart: always
+    container_name: attendance-system-backend
+    ports:
+      - 3000:3000
