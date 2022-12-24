@@ -26,8 +26,18 @@ const userController = {
       return res.json({
         status: 'success',
         message: 'login successful',
-        token: token
+        token: token,
+        user: { id: user.id, account: user.account, name: user.name, role: user.role }
       })
+    })
+  },
+
+  getUsers: (req, res) => {
+    User.findAll().then(users => {
+        users = users.map(user => ({
+        ...user.dataValues
+      }))
+      return res.json(users)
     })
   }
 }
