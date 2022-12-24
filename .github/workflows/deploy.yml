@@ -7,7 +7,7 @@ on:
       - completed
 
 jobs:
-  build-docker-image:
+  build-and-push-docker-image:
     
     runs-on: ubuntu-latest
     steps:
@@ -24,7 +24,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Build and push
+        name: Build and Push
         uses: docker/build-push-action@v3
         with:
           push: true
