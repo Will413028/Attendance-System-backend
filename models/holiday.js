@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Holiday.init({
     date: DataTypes.DATEONLY,
-    name: DataTypes.STRING,
+    description: DataTypes.STRING,
     is_holiday: DataTypes.BOOLEAN,
     holiday_category: DataTypes.STRING
   }, {

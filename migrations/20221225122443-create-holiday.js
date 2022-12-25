@@ -12,14 +12,22 @@ module.exports = {
       date: {
         type: Sequelize.DATEONLY
       },
-      name: {
-        type: Sequelize.STRING
-      },
       is_holiday: {
         type: Sequelize.BOOLEAN
       },
       holiday_category: {
         type: Sequelize.STRING
+      },
+      description: {
+        type: Sequelize.STRING
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
       }
     });
   },
