@@ -8,7 +8,9 @@ module.exports = (sequelize, DataTypes) => {
     stats: DataTypes.STRING
   }, {});
   Attendance.associate = function (models) {
-    Attendance.belongsTo(models.User)
+    Attendance.belongsTo(models.User, {
+      foreignKey: "user_id"
+    })
   };
   return Attendance;
 };
