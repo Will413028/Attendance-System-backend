@@ -1,23 +1,33 @@
 const db = require('../models')
 const Attendance = db.Attendance
+const Holiday = db.Holiday
 const moment = require('moment')
 
 const attendanceController = {
     createAttendance: async (req, res) => {
+        let workday;
+        let is_after_midnight = moment().isAfter(moment().format('YYYY-MM-DD 00:00:00'));
+        let is_before_workday_change = moment().isBefore(moment().format('YYYY-MM-DD 05:00:00'));
 
-        let is_holiday = await db.Holiday.findOne({
+        if (is_after_midnight && is_before_workday_change) {
+            workday = moment().add(-1, 'days').format('YYYY-MM-DD');
+        } else {
+            workday = moment().format('YYYY-MM-DD');
+        }
+
+        let holiday = await Holiday.findOne({
             where: {
-                date: moment(new Date()).format('YYYY-MM-DD')
+                date: workday
             }
         })
 
-        if (is_holiday.is_holiday) {
+        if (holiday && holiday.is_holiday) {
             return res.status(400).json({ message: 'today is holiday' });
         }
 
         let create_time;
         if (!req.body.create_time) {
-            create_time = new Date();
+            create_time = moment().format('YYYY-MM-DD HH:mm:ss');
         } else {
             create_time = req.body.create_time
         }
@@ -25,14 +35,14 @@ const attendanceController = {
         let attendance_record = await Attendance.findOne({
             where: {
                 user_id: req.body.user_id,
-                attend_date: moment(new Date()).format('YYYY-MM-DD')
+                attend_date: workday
             }
         })
 
         let status = "present";
 
         if (attendance_record) {
-            let diff_hour = moment().diff(attendance_record.toJSON().clock_in_time, 'hour');
+            let diff_hour = moment().diff(attendance_record.clock_in_time, 'hour');
 
             if (diff_hour < 8) {
                 status = "absent";
@@ -46,7 +56,7 @@ const attendanceController = {
             await Attendance.create({
                 user_id: req.body.user_id,
                 clock_in_time: create_time,
-                attend_date: moment(create_time).format('YYYY-MM-DD'),
+                attend_date: workday,
                 status: status
             })
             return res.status(200).json({ message: 'clock_in success' });
