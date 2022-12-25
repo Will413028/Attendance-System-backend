@@ -5,32 +5,38 @@ const db = require('../models')
 const User = db.User
 
 const userController = {
-
-    login: (req, res) => {
-        const { account, password } = req.body
+    login: async (req, res) => {
+        const { account, password } = req.body;
 
         if (!account || !password) {
             return res.status(400).json({ message: "account & password are reauired" });
         }
 
-        return User.findOne({
-            where: { account }
-        }).then(user => {
-            if (!user) {
-                return res.status(404).json({ message: "Account does not exist" });
-            }
-            if (!bcrypt.compareSync(password, user.password)) {
+        let user = await User.findOne({ where: { account } });
+
+        if (!user) {
+            return res.status(404).json({ message: "Account does not exist" });
+        }
+
+        if (user.error_times >= 5) {
+            return res.status(400).json({ message: "This account has been locked because it has reached the maximum number of failed login attempts." });
+        }
+
+        if (!bcrypt.compareSync(password, user.password)) {
+            if (user.error_times < 5) {
+                await user.update({ error_times: user.error_times + 1 });
                 return res.status(400).json({ message: "Password incorrect" });
             }
+        }
+        await user.update({ error_times: 0 });
 
-            const payload = { id: user.id }
-            const token = jwt.sign(payload, process.env.JWT_SECRET)
-            return res.status(200).json({
-                status: 'success',
-                message: 'login successful',
-                token: token,
-                user: { id: user.id, account: user.account, name: user.name, role: user.role }
-            })
+        const payload = { id: user.id };
+        const token = jwt.sign(payload, process.env.JWT_SECRET);
+        return res.status(200).json({
+            status: 'success',
+            message: 'login successful',
+            token: token,
+            user: { id: user.id, account: user.account, name: user.name, role: user.role }
         })
     },
 
