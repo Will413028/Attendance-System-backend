@@ -11,6 +11,7 @@ router.post('/login', userController.login)
 
 //user
 router.get('/user', verifyToken, userController.getUsers)
+router.put('/user/:id', verifyToken, userController.updateUser)
 
 //attendance
 router.post('/attendance', verifyToken, attendanceController.createAttendance)

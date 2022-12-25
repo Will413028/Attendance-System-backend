@@ -54,11 +54,16 @@ const attendanceController = {
             return res.json({ status: 'success', message: 'clock_in successful'})
         }
     },
-    updateAttendance: async (req, res) => {
-    await Attendance.update({ ...req.body }, { where: { id: req.params.id } })
 
-    return res.json({ status: 'success', message: '資料編輯成功' })
-  },
+    updateAttendance: async (req, res) => {
+        const attendance = await Attendance.findByPk(req.params.id);
+        
+        if (!attendance) {
+            return res.json({ status: 'failed', message: 'Attendance not found' });
+        }
+        await Attendance.update({ ...req.body }, { where: { id: req.params.id } })
+        return res.json({ status: 'success', message: 'update success' })
+    }
 }
 
 module.exports = attendanceController
