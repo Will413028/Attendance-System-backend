@@ -4,6 +4,17 @@ const moment = require('moment')
 
 const attendanceController = {
     postAttendance: async (req, res) => {
+
+        let is_holiday = await db.Holiday.findOne({ 
+            where: { 
+                date: moment(new Date()).format('YYYY-MM-DD')
+            }
+        })
+
+        if(is_holiday.is_holiday){
+            return res.json({ status: 'fail', message: 'today is holiday'})
+        }
+
         let create_time;
         if(!req.body.create_time) {
             create_time = new Date();
