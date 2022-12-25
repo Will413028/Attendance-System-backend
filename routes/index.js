@@ -13,7 +13,8 @@ router.post('/login', userController.login)
 router.get('/user', verifyToken, userController.getUsers)
 
 //attendance
-router.post('/attendance', verifyToken, attendanceController.postAttendance)
+router.post('/attendance', verifyToken, attendanceController.createAttendance)
+router.put('/attendance/:id', verifyToken, attendanceController.updateAttendance)
 
 //holiday
 router.put('/holiday', verifyToken, holidayController.updateHolidays)

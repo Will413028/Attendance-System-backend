@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     clock_in_time: DataTypes.DATE,
     clock_out_time: DataTypes.DATE,
     attend_date: DataTypes.DATEONLY,
-    stats: DataTypes.STRING
+    status: DataTypes.STRING
   }, {});
   Attendance.associate = function (models) {
     Attendance.belongsTo(models.User, {

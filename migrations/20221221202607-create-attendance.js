@@ -18,7 +18,7 @@ module.exports = {
       attend_date: {
         type: Sequelize.DATEONLY
       },
-      stats: {
+      status: {
         type: Sequelize.STRING
       },
       createdAt: {
