@@ -5,25 +5,25 @@ const moment = require('moment')
 const attendanceController = {
     createAttendance: async (req, res) => {
 
-        let is_holiday = await db.Holiday.findOne({ 
-            where: { 
+        let is_holiday = await db.Holiday.findOne({
+            where: {
                 date: moment(new Date()).format('YYYY-MM-DD')
             }
         })
 
-        if(is_holiday.is_holiday){
-            return res.json({ status: 'fail', message: 'today is holiday'})
+        if (is_holiday.is_holiday) {
+            return res.status(400).json({ message: 'today is holiday' });
         }
 
         let create_time;
-        if(!req.body.create_time) {
+        if (!req.body.create_time) {
             create_time = new Date();
         } else {
             create_time = req.body.create_time
         }
 
-        let attendance_record = await Attendance.findOne({ 
-            where: { 
+        let attendance_record = await Attendance.findOne({
+            where: {
                 user_id: req.body.user_id,
                 attend_date: moment(new Date()).format('YYYY-MM-DD')
             }
@@ -41,8 +41,7 @@ const attendanceController = {
                 clock_out_time: create_time,
                 status: status
             })
-
-            return res.json({ status: 'success', message: 'clock_out successful'})
+            return res.status(200).json({ message: 'clock_out success' });
         } else {
             await Attendance.create({
                 user_id: req.body.user_id,
@@ -50,19 +49,18 @@ const attendanceController = {
                 attend_date: moment(create_time).format('YYYY-MM-DD'),
                 status: status
             })
-
-            return res.json({ status: 'success', message: 'clock_in successful'})
+            return res.status(200).json({ message: 'clock_in success' });
         }
     },
 
     updateAttendance: async (req, res) => {
         const attendance = await Attendance.findByPk(req.params.id);
-        
+
         if (!attendance) {
-            return res.json({ status: 'failed', message: 'Attendance not found' });
+            return res.status(404).json({ message: "Attendance not found" });
         }
         await Attendance.update({ ...req.body }, { where: { id: req.params.id } })
-        return res.json({ status: 'success', message: 'update success' })
+        return res.status(200).json({ message: 'update success' });
     }
 }
 
