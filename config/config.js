@@ -8,5 +8,9 @@ module.exports = {
     database: process.env.DB_DATABASE,
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
-    dialect: "mysql"
+    dialect: "mysql",
+    HOLIDAY: {
+        ENABLE: true,
+        URL: 'https://data.ntpc.gov.tw/api/datasets/308DCD75-6434-45BC-A95F-584DA4FED251/json?page=1&size=1000'
+    }
 }
