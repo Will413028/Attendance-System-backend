@@ -12,5 +12,8 @@ module.exports = {
     HOLIDAY: {
         ENABLE: true,
         URL: 'https://data.ntpc.gov.tw/api/datasets/308DCD75-6434-45BC-A95F-584DA4FED251/json?page=1&size=1000'
+    },
+    ATTENDANCE: {
+        WORKING_HOURS: 8
     }
 }
