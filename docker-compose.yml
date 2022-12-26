@@ -1,5 +1,9 @@
 version: '3.5'
 
+networks:
+  production:
+    name: production
+
 services:
   attendance-system-backend:
     image: will413028/attendance-system-backend:latest
@@ -7,3 +11,20 @@ services:
     container_name: attendance-system-backend
     ports:
       - 3000:3000
+    environment:
+      - PORT=3000
+      - JWT_SECRET=JWT_SECRET
+      - DB_USERNAME=root
+      - DB_ROOT_PASSWORD=12345678
+      - DB_DATABASE=attendance-system
+      - DB_HOST=192.168.100.40
+      - DB_PORT=3306
+  mysql:
+    image: mysql:5.7
+    restart: always
+    container_name: mysql
+    ports: 
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=12345678 
+      - MYSQL_DATABASE=attendance-system
