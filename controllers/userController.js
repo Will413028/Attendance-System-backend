@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../models');
 const User = db.User;
+const Attendance = db.Attendance
 
 const userController = {
     login: async (req, res) => {
@@ -50,13 +51,18 @@ const userController = {
         return res.status(200).json({ message: "update user success" });
     },
 
-    getUsers: (req, res) => {
-        User.findAll().then(users => {
-            users = users.map(user => ({
-                ...user.dataValues
-            }))
-            return res.status(200).json(users);
+    getUsers: async (req, res) => {
+        const body = req.body;
+
+        const users = await User.findAll({ 
+            include: {
+                model: Attendance,
+                where: {
+                    status: "absent"
+                }
+            }
         })
+        return res.status(200).json(users);
     }
 }
 
