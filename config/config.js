@@ -14,6 +14,7 @@ module.exports = {
         URL: 'https://data.ntpc.gov.tw/api/datasets/308DCD75-6434-45BC-A95F-584DA4FED251/json?page=1&size=1000'
     },
     ATTENDANCE: {
-        WORKING_HOURS: 8
+        WORKING_HOURS: 8,
+        TIME_POINT_OF_WORKDAY_CHANGING: "05:00:00"
     }
 }

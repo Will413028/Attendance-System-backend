@@ -8,7 +8,7 @@ const attendanceController = {
     createAttendance: async (req, res) => {
         let workday;
         let is_after_midnight = moment().isAfter(moment().format('YYYY-MM-DD 00:00:00'));
-        let is_before_workday_change = moment().isBefore(moment().format('YYYY-MM-DD 05:00:00'));
+        let is_before_workday_change = moment().isBefore(moment().format(`YYYY-MM-DD ${config.ATTENDANCE.TIME_POINT_OF_WORKDAY_CHANGING}`));
 
         if (is_after_midnight && is_before_workday_change) {
             workday = moment().add(-1, 'days').format('YYYY-MM-DD');
@@ -35,32 +35,40 @@ const attendanceController = {
             }
         })
 
-
         if (attendance_record) {
             let diff_hour = moment().diff(attendance_record.clock_in_time, 'hour');
             let status;
 
             if (diff_hour < config.ATTENDANCE.WORKING_HOURS) {
                 status = "absence";
+            } else {
+                status = "present";
             }
 
-            await attendance_record.update({
-                clock_out_time: create_time,
-                status: "present"
-            })
-
-            if (status === "absence") {
-                return res.status(200).json({ message: 'less than eight hours, status is absence' });
-            } else {
-                return res.status(200).json({ message: 'clock_out success' });
+            try {
+                let attendance = await attendance_record.update({
+                    clock_out_time: create_time,
+                    status: status
+                })
+                if (attendance.status === "present") {
+                    return res.status(200).json({ message: 'clock_out success' });
+                } else {
+                    return res.status(200).json({ message: 'less than working hours, status is absence' });
+                }
+            } catch (err) {
+                return res.status(400).json({ error: `clock out failed: ${err}` });
             }
         } else {
-            await Attendance.create({
-                user_id: req.body.user_id,
-                clock_in_time: create_time,
-                attend_date: workday,
-                status: "pending"
-            })
+            try {
+                await Attendance.create({
+                    user_id: req.body.user_id,
+                    clock_in_time: create_time,
+                    attend_date: workday,
+                    status: "pending"
+                })
+            } catch (err) {
+                return res.status(400).json({ error: `clock in failed: ${err}` });
+            }
             return res.status(200).json({ message: 'clock_in success' });
         }
     },
@@ -71,8 +79,12 @@ const attendanceController = {
         if (!attendance) {
             return res.status(404).json({ message: "Attendance not found" });
         }
-        await Attendance.update({ ...req.body }, { where: { id: req.params.id } });
-        return res.status(200).json({ message: 'update success' });
+        try {
+            await Attendance.update({ ...req.body }, { where: { id: req.params.id } });
+            return res.status(200).json({ message: 'update success' });
+        } catch (err) {
+            return res.status(400).json({ error: `update attendance failed: ${err}` });
+        }
     }
 }
 
