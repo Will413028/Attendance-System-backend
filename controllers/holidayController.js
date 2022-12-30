@@ -5,7 +5,6 @@ const config = require('../config/config');
 
 const holidayController = {
     updateHolidays: async (req, res) => {
-
         let holiday_url = config.HOLIDAY.URL;
         let calendar;
         try {
@@ -13,6 +12,8 @@ const holidayController = {
         } catch (err) {
             return res.status(400).json({ error: `fetch calendar failed: ${err}` });
         }
+
+        const trx = await db.sequelize.transaction();
 
         try {
             for (i = 0; i < calendar.length; i++) {
@@ -28,8 +29,10 @@ const holidayController = {
                     }
                 });
             }
-        } catch (err) {
-            return res.status(400).json({ error: `update holiday failed: ${err}` });
+            await trx.commit();
+        } catch (error) {
+            await trx.rollback();
+            return res.status(400).json({ error: `update holiday failed: ${error}` });
         }
         return res.status(200).json({ message: 'update holiday success' });
     }
