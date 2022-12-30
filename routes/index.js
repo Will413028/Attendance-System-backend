@@ -5,7 +5,7 @@ const router = Router()
 const userController = require('../controllers/userController')
 const attendanceController = require('../controllers/attendanceController')
 const holidayController = require('../controllers/holidayController')
-const { verifyToken } = require('../middlewares/auth')
+const { verifyToken, authIsAdmin } = require('../middlewares/auth')
 
 router.post('/login', userController.login)
 
@@ -15,7 +15,7 @@ router.put('/user/:id', verifyToken, userController.updateUser)
 
 //attendance
 router.post('/attendance', verifyToken, attendanceController.createAttendance)
-router.put('/attendance/:id', verifyToken, attendanceController.updateAttendance)
+router.put('/attendance/:id', verifyToken, authIsAdmin, attendanceController.updateAttendance)
 
 //holiday
 router.put('/holiday', verifyToken, holidayController.updateHolidays)

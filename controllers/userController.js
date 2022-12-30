@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../models');
 const User = db.User;
-const Attendance = db.Attendance
+const Attendance = db.Attendance;
 
 const userController = {
     login: async (req, res) => {
@@ -28,15 +28,17 @@ const userController = {
                 return res.status(400).json({ message: "Password incorrect" });
             }
         }
+
         await user.update({ error_times: 0 });
 
         const payload = { id: user.id };
         const token = jwt.sign(payload, process.env.JWT_SECRET);
         return res.status(200).json({
-            status: 'success',
-            message: 'login successful',
             token: token,
-            user: { id: user.id, account: user.account, name: user.name, role: user.role }
+            id: user.id,
+            account: user.account,
+            name: user.name,
+            role: user.role
         })
     },
 
@@ -54,7 +56,7 @@ const userController = {
     getUsers: async (req, res) => {
         const body = req.body;
 
-        const users = await User.findAll({ 
+        const users = await User.findAll({
             include: {
                 model: Attendance,
                 where: {
