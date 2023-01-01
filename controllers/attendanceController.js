@@ -5,6 +5,39 @@ const moment = require('moment');
 const config = require('../config/config');
 
 const attendanceController = {
+    getAttendance: async (req, res) => {
+        let { user_id, attend_date, status } = req.query;
+        let where_conditions = {};
+
+        if (user_id) {
+            where_conditions["user_id"] = user_id;
+        }
+
+        if (attend_date) {
+            where_conditions["attend_date"] = attend_date;
+        }
+
+        if (status) {
+            where_conditions["attend_date"] = status;
+        }
+
+        let attendances = await Attendance.findAll({
+            where: where_conditions
+        })
+
+        let res_data;
+        if (attendances.length > 0) {
+            res_data = {
+                length: attendances.length,
+                data: attendances
+            }
+        } else {
+            return res.status(404).json({ message: "attendances not found" });
+        }
+
+        return res.status(200).json({ data: res_data, message: "get attendances successfully" });
+    },
+    
     createAttendance: async (req, res) => {
         let workday;
         let is_after_midnight = moment().isAfter(moment().format('YYYY-MM-DD 00:00:00'));
