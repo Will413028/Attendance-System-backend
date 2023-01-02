@@ -22,10 +22,17 @@ const attendanceController = {
         }
 
         let attendances = await Attendance.findAll({
-            where: where_conditions
+            where: where_conditions,
+            order: [["attend_date", "DESC"]]
         })
 
-        let res_data;
+        attendances.forEach(element => {
+            element.dataValues.clock_in_time = moment(element.clock_in_time).format('YYYY-MM-DD HH:mm:ss');
+            element.dataValues.clock_out_time = moment(element.clock_out_time).format('YYYY-MM-DD HH:mm:ss');
+        });
+
+        let res_data = {};
+
         if (attendances.length > 0) {
             res_data = {
                 length: attendances.length,
@@ -34,10 +41,9 @@ const attendanceController = {
         } else {
             return res.status(404).json({ message: "attendances not found" });
         }
-
         return res.status(200).json({ data: res_data, message: "get attendances successfully" });
     },
-    
+
     createAttendance: async (req, res) => {
         let workday;
         let is_after_midnight = moment().isAfter(moment().format('YYYY-MM-DD 00:00:00'));
@@ -83,26 +89,34 @@ const attendanceController = {
                     clock_out_time: create_time,
                     status: status
                 })
+
+                attendance.dataValues.clock_in_time = moment(attendance.clock_in_time).format('YYYY-MM-DD HH:mm:ss');
+                attendance.dataValues.clock_out_time = moment(attendance.clock_out_time).format('YYYY-MM-DD HH:mm:ss');
+
                 if (attendance.status === "present") {
-                    return res.status(200).json({ message: 'clock_out success' });
+                    return res.status(200).json({ data: attendance, message: 'clock_out success' });
                 } else {
-                    return res.status(200).json({ message: 'less than working hours, status is absence' });
+                    return res.status(200).json({ data: attendance, message: 'less than working hours, status is absence' });
                 }
             } catch (err) {
                 return res.status(400).json({ error: `clock out failed: ${err}` });
             }
         } else {
             try {
-                await Attendance.create({
+                let attendance = await Attendance.create({
                     user_id: req.body.user_id,
                     clock_in_time: create_time,
                     attend_date: workday,
                     status: "pending"
                 })
+
+                attendance.dataValues.clock_in_time = moment(attendance.clock_in_time).format('YYYY-MM-DD HH:mm:ss');
+                attendance.dataValues.clock_out_time = moment(attendance.clock_out_time).format('YYYY-MM-DD HH:mm:ss');
+
+                return res.status(200).json({ data: attendance, message: 'clock_in success' });
             } catch (err) {
                 return res.status(400).json({ error: `clock in failed: ${err}` });
             }
-            return res.status(200).json({ message: 'clock_in success' });
         }
     },
 
