@@ -54,17 +54,40 @@ const userController = {
     },
 
     getUsers: async (req, res) => {
-        const body = req.body;
+        let { user_id, attend_date, status } = req.query;
 
+        let where_conditions = {};
+
+        if (user_id) {
+            where_conditions["user_id"] = user_id;
+        }
+
+        if (attend_date) {
+            where_conditions["attend_date"] = attend_date;
+        }
+
+        if (status) {
+            where_conditions["status"] = status;
+        }
+        
         const users = await User.findAll({
             include: {
                 model: Attendance,
-                where: {
-                    status: "absent"
-                }
+                where: where_conditions
             }
         })
-        return res.status(200).json(users);
+
+        let res_data = {};
+
+        if (users.length > 0) {
+            res_data = {
+                length: users.length,
+                data: users
+            }
+        } else {
+            return res.status(404).json({ message: "user not found" });
+        }
+        return res.status(200).json({ data: res_data, message: "get users successfully" });
     }
 }
 
