@@ -16,7 +16,7 @@ router.put('/user/:id', verifyToken, userController.updateUser)
 //attendance
 router.get('/attendance', verifyToken, attendanceController.getAttendance)
 router.post('/attendance', verifyToken, attendanceController.createAttendance)
-router.get('/createAttendanceQRcode', verifyToken, attendanceController.createAttendanceByQRcode)
+router.get('/createAttendanceQRcode', verifyToken, attendanceController.createAttendance)
 router.put('/attendance/:id', verifyToken, authIsAdmin, attendanceController.updateAttendance)
 
 //holiday

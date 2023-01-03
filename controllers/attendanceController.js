@@ -57,9 +57,21 @@ const attendanceController = {
 
         let create_time = moment().format('YYYY-MM-DD HH:mm:ss');
 
+        let user_id;
+
+        if (req.body.user_id) {
+            user_id = req.body.user_id
+        } else if (req.query.user_id) {
+            user_id = req.query.user_id
+        }
+
+        if (!user_id) {
+            return res.status(400).json({ message: 'user_id is required' });
+        }
+
         let attendance_record = await Attendance.findOne({
             where: {
-                user_id: req.body.user_id,
+                user_id: user_id,
                 attend_date: workday
             }
         })
@@ -94,7 +106,7 @@ const attendanceController = {
         } else {
             try {
                 let attendance = await Attendance.create({
-                    user_id: req.body.user_id,
+                    user_id: user_id,
                     clock_in_time: create_time,
                     attend_date: workday,
                     status: "pending"
@@ -121,72 +133,6 @@ const attendanceController = {
             return res.status(200).json({ message: 'update success' });
         } catch (err) {
             return res.status(400).json({ error: `update attendance failed: ${err}` });
-        }
-    },
-
-    createAttendanceByQRcode: async (req, res) => {
-        let workday = attendanceServices.getWorkday();
-
-        if (config.HOLIDAY.ENABLE) {
-            let isHoliday = await attendanceServices.isHoliday(workday);
-
-            if (isHoliday) {
-                return res.status(400).json({ message: 'today is holiday' });
-            }
-        }
-
-        let create_time = moment().format('YYYY-MM-DD HH:mm:ss');
-
-        let attendance_record = await Attendance.findOne({
-            where: {
-                user_id: req.query.user_id,
-                attend_date: workday
-            }
-        })
-
-        if (attendance_record) {
-            let diff_hour = moment().diff(attendance_record.clock_in_time, 'hour');
-            let status;
-
-            if (diff_hour < config.ATTENDANCE.WORKING_HOURS) {
-                status = "absence";
-            } else {
-                status = "present";
-            }
-
-            try {
-                let attendance = await attendance_record.update({
-                    clock_out_time: create_time,
-                    status: status
-                })
-
-                attendance.dataValues.clock_in_time = moment(attendance.clock_in_time).format('YYYY-MM-DD HH:mm:ss');
-                attendance.dataValues.clock_out_time = moment(attendance.clock_out_time).format('YYYY-MM-DD HH:mm:ss');
-
-                if (attendance.status === "present") {
-                    return res.status(200).json({ data: attendance, message: 'clock_out success' });
-                } else {
-                    return res.status(200).json({ data: attendance, message: 'less than working hours, status is absence' });
-                }
-            } catch (err) {
-                return res.status(400).json({ error: `clock out failed: ${err}` });
-            }
-        } else {
-            try {
-                let attendance = await Attendance.create({
-                    user_id: req.query.user_id,
-                    clock_in_time: create_time,
-                    attend_date: workday,
-                    status: "pending"
-                })
-
-                attendance.dataValues.clock_in_time = moment(attendance.clock_in_time).format('YYYY-MM-DD HH:mm:ss');
-                attendance.dataValues.clock_out_time = moment(attendance.clock_out_time).format('YYYY-MM-DD HH:mm:ss');
-
-                return res.status(200).json({ data: attendance, message: 'clock_in success' });
-            } catch (err) {
-                return res.status(400).json({ error: `clock in failed: ${err}` });
-            }
         }
     }
 }
