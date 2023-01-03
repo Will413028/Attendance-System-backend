@@ -1,8 +1,9 @@
 const db = require('../models');
 const Attendance = db.Attendance;
+const Holiday = db.Holiday;
 const moment = require('moment');
 const config = require('../config/config');
-const attendanceServices = require('../services/attendance');
+const Date = require('../utils/date');
 
 const attendanceController = {
     getAttendance: async (req, res) => {
@@ -45,11 +46,14 @@ const attendanceController = {
     },
 
     createAttendance: async (req, res) => {
-        let workday = attendanceServices.getWorkday();
+        let weekday = Date.getWeekday(config.ATTENDANCE.TIME_POINT_OF_WEEKDAY_CHANGING);
 
         if (config.HOLIDAY.ENABLE) {
-            let isHoliday = await attendanceServices.isHoliday(workday);
-
+            let isHoliday = await Holiday.findOne({
+                where: {
+                    date: weekday
+                }
+            })
             if (isHoliday) {
                 return res.status(400).json({ message: 'today is holiday' });
             }
@@ -72,7 +76,7 @@ const attendanceController = {
         let attendance_record = await Attendance.findOne({
             where: {
                 user_id: user_id,
-                attend_date: workday
+                attend_date: weekday
             }
         })
 
@@ -108,7 +112,7 @@ const attendanceController = {
                 let attendance = await Attendance.create({
                     user_id: user_id,
                     clock_in_time: create_time,
-                    attend_date: workday,
+                    attend_date: weekday,
                     status: config.ATTENDANCE.STATUS.PENDING
                 })
 
