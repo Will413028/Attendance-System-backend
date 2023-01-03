@@ -16,6 +16,15 @@ const attendanceServices = {
             workday = moment().format('YYYY-MM-DD');
         }
         return workday;
+    },
+
+    isHoliday: async (workday) => {
+        let holiday = await Holiday.findOne({
+            where: {
+                date: workday
+            }
+        })
+        return holiday
     }
 }
 

@@ -1,6 +1,5 @@
 const db = require('../models');
 const Attendance = db.Attendance;
-const Holiday = db.Holiday;
 const moment = require('moment');
 const config = require('../config/config');
 const attendanceServices = require('../services/attendance');
@@ -48,14 +47,12 @@ const attendanceController = {
     createAttendance: async (req, res) => {
         let workday = attendanceServices.getWorkday();
 
-        let holiday = await Holiday.findOne({
-            where: {
-                date: workday
-            }
-        })
+        if (config.HOLIDAY.ENABLE) {
+            let isHoliday = await attendanceServices.isHoliday(workday);
 
-        if (holiday && holiday.is_holiday) {
-            return res.status(400).json({ message: 'today is holiday' });
+            if (isHoliday) {
+                return res.status(400).json({ message: 'today is holiday' });
+            }
         }
 
         let create_time = moment().format('YYYY-MM-DD HH:mm:ss');
@@ -130,14 +127,12 @@ const attendanceController = {
     createAttendanceByQRcode: async (req, res) => {
         let workday = attendanceServices.getWorkday();
 
-        let holiday = await Holiday.findOne({
-            where: {
-                date: workday
-            }
-        })
+        if (config.HOLIDAY.ENABLE) {
+            let isHoliday = await attendanceServices.isHoliday(workday);
 
-        if (holiday && holiday.is_holiday) {
-            return res.status(400).json({ message: 'today is holiday' });
+            if (isHoliday) {
+                return res.status(400).json({ message: 'today is holiday' });
+            }
         }
 
         let create_time = moment().format('YYYY-MM-DD HH:mm:ss');
