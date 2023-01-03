@@ -18,7 +18,7 @@ const attendanceController = {
         }
 
         if (status) {
-            where_conditions["attend_date"] = status;
+            where_conditions["status"] = status;
         }
 
         let attendances = await Attendance.findAll({
@@ -81,9 +81,9 @@ const attendanceController = {
             let status;
 
             if (diff_hour < config.ATTENDANCE.WORKING_HOURS) {
-                status = "absence";
+                status = config.ATTENDANCE.STATUS.ABSENCE;
             } else {
-                status = "present";
+                status = config.ATTENDANCE.STATUS.PRESENT;
             }
 
             try {
@@ -95,7 +95,7 @@ const attendanceController = {
                 attendance.dataValues.clock_in_time = moment(attendance.clock_in_time).format('YYYY-MM-DD HH:mm:ss');
                 attendance.dataValues.clock_out_time = moment(attendance.clock_out_time).format('YYYY-MM-DD HH:mm:ss');
 
-                if (attendance.status === "present") {
+                if (attendance.status === config.ATTENDANCE.STATUS.PRESENT) {
                     return res.status(200).json({ data: attendance, message: 'clock_out success' });
                 } else {
                     return res.status(200).json({ data: attendance, message: 'less than working hours, status is absence' });
@@ -109,7 +109,7 @@ const attendanceController = {
                     user_id: user_id,
                     clock_in_time: create_time,
                     attend_date: workday,
-                    status: "pending"
+                    status: config.ATTENDANCE.STATUS.PENDING
                 })
 
                 attendance.dataValues.clock_in_time = moment(attendance.clock_in_time).format('YYYY-MM-DD HH:mm:ss');
@@ -128,8 +128,15 @@ const attendanceController = {
         if (!attendance) {
             return res.status(404).json({ message: "Attendance not found" });
         }
+
+        let status = req.body.status;
+
+        if (!(config.ATTENDANCE.STATUS.NAMES.includes(status))) {
+            return res.status(400).json({ message: "invaild status" });
+        }
+
         try {
-            await Attendance.update({ ...req.body }, { where: { id: req.params.id } });
+            await Attendance.update({ status: status }, { where: { id: req.params.id } });
             return res.status(200).json({ message: 'update success' });
         } catch (err) {
             return res.status(400).json({ error: `update attendance failed: ${err}` });
