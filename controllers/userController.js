@@ -35,10 +35,12 @@ const userController = {
         const token = jwt.sign(payload, process.env.JWT_SECRET);
         return res.status(200).json({
             token: token,
-            id: user.id,
-            account: user.account,
-            name: user.name,
-            role: user.role
+            user: {
+                id: user.id,
+                account: user.account,
+                name: user.name,
+                role: user.role
+            }
         })
     },
 
@@ -49,7 +51,9 @@ const userController = {
             return res.status(404).json({ message: "User not found" });
         }
 
-        await User.update({ password: req.body.password }, { where: { id: req.params.id } });
+        let password = bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10), null);
+
+        await User.update({ password: password }, { where: { id: req.params.id } });
         return res.status(200).json({ message: "update user success" });
     },
 
@@ -69,7 +73,7 @@ const userController = {
         if (status) {
             where_conditions["status"] = status;
         }
-        
+
         const users = await User.findAll({
             include: {
                 model: Attendance,
