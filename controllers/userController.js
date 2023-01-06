@@ -23,10 +23,8 @@ const userController = {
         }
 
         if (!bcrypt.compareSync(password, user.password)) {
-            if (user.error_times < 5) {
-                await user.update({ error_times: user.error_times + 1 });
-                return res.status(400).json({ message: "Password incorrect" });
-            }
+            await user.update({ error_times: user.error_times + 1 });
+            return res.status(400).json({ message: "Password incorrect" });
         }
 
         await user.update({ error_times: 0 });
@@ -58,7 +56,7 @@ const userController = {
     },
 
     getUsers: async (req, res) => {
-        let { user_id, attend_date, status } = req.query;
+        let { user_id, attend_date, status, error_times } = req.query;
 
         let where_conditions = {};
 
@@ -72,6 +70,10 @@ const userController = {
 
         if (status) {
             where_conditions["status"] = status;
+        }
+
+        if (error_times) {
+            where_conditions["error_times"] = error_times;
         }
 
         const users = await User.findAll({
