@@ -3,7 +3,8 @@ const Attendance = db.Attendance;
 const Holiday = db.Holiday;
 const moment = require('moment');
 const config = require('../config/config');
-const Date = require('../utils/date');
+const DateUtil = require('../utils/date');
+const attendanceService = require('../services/attendance')
 
 const attendanceController = {
     getAttendance: async (req, res) => {
@@ -22,14 +23,12 @@ const attendanceController = {
             where_conditions["status"] = status;
         }
 
-        let attendances = await Attendance.findAll({
-            where: where_conditions,
-            order: [["attend_date", "DESC"]]
-        })
+        let attendances = await attendanceService.findAll(where_conditions);
+
 
         attendances.forEach(element => {
-            element.dataValues.clock_in_time = moment(element.clock_in_time).format('YYYY-MM-DD HH:mm:ss');
-            element.dataValues.clock_out_time = moment(element.clock_out_time).format('YYYY-MM-DD HH:mm:ss');
+            element.dataValues.clock_in_time = DateUtil.dateFormat(element.dataValues.clock_in_time);
+            element.dataValues.clock_out_time = DateUtil.dateFormat(element.dataValues.clock_out_time);
         });
 
         let res_data = {};
@@ -46,7 +45,7 @@ const attendanceController = {
     },
 
     createAttendance: async (req, res) => {
-        let weekday = Date.getWeekday(config.ATTENDANCE.TIME_POINT_OF_WEEKDAY_CHANGING);
+        let weekday = DateUtil.getWeekday(config.ATTENDANCE.TIME_POINT_OF_WEEKDAY_CHANGING);
 
         if (config.HOLIDAY.ENABLE) {
             let isHoliday = await Holiday.findOne({
