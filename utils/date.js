@@ -1,18 +1,21 @@
 const moment = require('moment');
+const config = require('../config/config');
 
-const date = {
-    getWeekday: (time_point_of_weekday_changing) => {
-        let workday;
-        let is_after_midnight = moment().isAfter(moment().format('YYYY-MM-DD 00:00:00'));
-        let is_before_workday_change = moment().isBefore(moment().format(`YYYY-MM-DD ${time_point_of_weekday_changing}`));
+const DateUtil = {
+    getWeekday: () => {
+        let weekday = moment();
+        let is_privously_weekday = weekday.isBefore(moment().format(`YYYY-MM-DD ${config.ATTENDANCE.TIME_POINT_OF_WEEKDAY_CHANGING}`));
 
-        if (is_after_midnight && is_before_workday_change) {
-            workday = moment().add(-1, 'days').format('YYYY-MM-DD');
-        } else {
-            workday = moment().format('YYYY-MM-DD');
+        if (is_privously_weekday) {
+            weekday = moment().add(-1, 'days').format('YYYY-MM-DD');
         }
-        return workday;
+
+        return weekday;
+    },
+    dateFormat: (date = moment()) => {
+        formatedDate = moment(date).format('YYYY-MM-DD HH:mm:ss')
+        return formatedDate;
     }
 }
 
-module.exports = date;
+module.exports = DateUtil;
