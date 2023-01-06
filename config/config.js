@@ -11,14 +11,18 @@ module.exports = {
         WORKING_HOURS: 8,
         TIME_POINT_OF_WEEKDAY_CHANGING: "05:00:00",
         STATUS: {
-            ABSENCE: "absence",
-            PENDING: "pending",
-            PRESENT: "present",
-            NAMES:["absence", "pending", "present"]
+            ABSENCE: "Absent",
+            INCOMPLETE: "Incomplete",
+            PRESENT: "Present",
+            ON_LEAVE: "On_Leave",
+            NAMES: ["Absent", "Incomplete", "Present", "On_Leave"]
         }
     },
-    ROLES: {
-        HR: "HR",
-        EMPLOYEE: "employee"
+    USER: {
+        ROLES: {
+            HR: "HR",
+            EMPLOYEE: "employee"
+        },
+        MAXIMUM_FAILED_LOGIN_ATTEMPTS: 5
     }
 }

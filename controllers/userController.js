@@ -1,8 +1,10 @@
 const bcrypt = require('bcryptjs');
+const config = require('../config/config');
 const jwt = require('jsonwebtoken');
 const db = require('../models');
 const User = db.User;
 const Attendance = db.Attendance;
+require('dotenv').config();
 
 const userController = {
     login: async (req, res) => {
@@ -18,7 +20,7 @@ const userController = {
             return res.status(404).json({ message: "Account does not exist" });
         }
 
-        if (user.error_times >= 5) {
+        if (user.error_times >= config.USER.MAXIMUM_FAILED_LOGIN_ATTEMPTS) {
             return res.status(400).json({ message: "This account has been locked because it has reached the maximum number of failed login attempts." });
         }
 

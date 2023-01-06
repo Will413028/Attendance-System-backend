@@ -13,7 +13,7 @@ verifyToken = async (req, res, next) => {
     });
   }
 
-  await jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET, (err) => {
     if (err) {
       return res.status(401).json({
         message: "Unauthorized!"
@@ -36,7 +36,7 @@ authIsAdmin = async (req, res, next) => {
 
   const currentUser = await User.findByPk(decoded.id);
 
-  if (currentUser && currentUser.role !== config.ROLES.HR) {
+  if (currentUser && currentUser.role !== config.USER.ROLES.HR) {
     return res.status(403).json({
       status: 'error',
       message: 'user does not have permission'

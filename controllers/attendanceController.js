@@ -112,7 +112,7 @@ const attendanceController = {
                     user_id: user_id,
                     clock_in_time: create_time,
                     attend_date: weekday,
-                    status: config.ATTENDANCE.STATUS.PENDING
+                    status: config.ATTENDANCE.STATUS.INCOMPLETE
                 })
 
                 attendance.dataValues.clock_in_time = moment(attendance.clock_in_time).format('YYYY-MM-DD HH:mm:ss');
