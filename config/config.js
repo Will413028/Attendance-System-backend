@@ -10,12 +10,15 @@ module.exports = {
     ATTENDANCE: {
         WORKING_HOURS: 8,
         TIME_POINT_OF_WEEKDAY_CHANGING: "05:00:00",
+        ENABLE_GPS_CHECK: true,
+        MAXIMUM_METER_TO_CLOCK_IN: 400,
         STATUS: {
             ABSENCE: "Absent",
             INCOMPLETE: "Incomplete",
             PRESENT: "Present",
             ON_LEAVE: "On_Leave",
-            NAMES: ["Absent", "Incomplete", "Present", "On_Leave"]
+            LEAVE_EARLY: "Leave_Early",
+            NAMES: ["Absent", "Incomplete", "Present", "On_Leave", "Leave_Early"]
         }
     },
     USER: {
@@ -24,5 +27,10 @@ module.exports = {
             EMPLOYEE: "employee"
         },
         MAXIMUM_FAILED_LOGIN_ATTEMPTS: 5
+    },
+    COMPANY: {
+        NAME: "test_company",
+        LATITUDE: 25.072636,
+        LONGITUDE: 121.372498,
     }
 }
