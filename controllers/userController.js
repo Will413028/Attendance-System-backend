@@ -29,10 +29,17 @@ const userController = {
             return res.status(400).json({ message: "Password incorrect" });
         }
 
-        await user.update({ error_times: 0 });
+        if (user.error_times > 0) {
+            try {
+                await user.update({ error_times: 0 });
+            } catch (error) {
+                return res.status(400).json({ message: `login error: ${err}` });
+            }
+        }
 
         const payload = { id: user.id };
         const token = jwt.sign(payload, process.env.JWT_SECRET);
+
         return res.status(200).json({
             token: token,
             user: {
@@ -51,9 +58,16 @@ const userController = {
             return res.status(404).json({ message: "User not found" });
         }
 
-        let password = bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10), null);
+        if (req.body.password) {
+            req.body.password = bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10), null);
+        }
 
-        await User.update({ password: password }, { where: { id: req.params.id } });
+        try {
+            await User.update(req.body, { where: { id: req.params.id } });
+        } catch (err) {
+            return res.status(400).json({ message: `update user failed: ${err}` });
+        }
+
         return res.status(200).json({ message: "update user success" });
     },
 
