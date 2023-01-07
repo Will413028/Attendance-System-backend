@@ -1,10 +1,9 @@
 const db = require('../models');
 const Attendance = db.Attendance;
-const Holiday = db.Holiday;
 const moment = require('moment');
 const config = require('../config/config');
 const DateUtil = require('../utils/date');
-const attendanceService = require('../services/attendance')
+const attendanceService = require('../services/attendance');
 
 const attendanceController = {
     getAttendance: async (req, res) => {
@@ -45,22 +44,11 @@ const attendanceController = {
     },
 
     createAttendance: async (req, res) => {
-        let weekday = DateUtil.getWeekday(config.ATTENDANCE.TIME_POINT_OF_WEEKDAY_CHANGING);
-
-        if (config.HOLIDAY.ENABLE) {
-            let isHoliday = await Holiday.findOne({
-                where: {
-                    date: weekday
-                }
-            })
-            if (isHoliday) {
-                return res.status(400).json({ message: 'today is holiday' });
-            }
-        }
-
-        let create_time = moment().format('YYYY-MM-DD HH:mm:ss');
+        let { latitude, longitude } = req.body;
 
         let user_id;
+
+        let current_time = moment().format('YYYY-MM-DD HH:mm:ss');
 
         if (req.body.user_id) {
             user_id = req.body.user_id
@@ -72,36 +60,54 @@ const attendanceController = {
             return res.status(400).json({ message: 'user_id is required' });
         }
 
-        let attendance_record = await Attendance.findOne({
-            where: {
-                user_id: user_id,
-                attend_date: weekday
+        if (config.ATTENDANCE.ENABLE_GPS_CHECK) {
+
+            if (!latitude || !longitude) {
+                return res.status(400).json({ message: 'current position is required' });
             }
-        })
+            let current_distance_to_company = await attendanceService.getDistance(latitude, longitude, config.COMPANY.LATITUDE, config.COMPANY.LONGITUDE);
 
-        if (attendance_record) {
-            let diff_hour = moment().diff(attendance_record.clock_in_time, 'hour');
-            let status;
+            if (current_distance_to_company > config.ATTENDANCE.MAXIMUM_METER_TO_CLOCK_IN) {
+                return res.status(400).json({ message: 'Too far from the company' });
+            }
+        }
 
-            if (diff_hour < config.ATTENDANCE.WORKING_HOURS) {
-                status = config.ATTENDANCE.STATUS.ABSENCE;
+        let weekday = await DateUtil.getWeekday(config.ATTENDANCE.TIME_POINT_OF_WEEKDAY_CHANGING);
+
+        if (config.HOLIDAY.ENABLE) {
+            let weekdayIsHoliday = attendanceService.isHoliday(weekday);
+            if (weekdayIsHoliday) {
+                return res.status(400).json({ message: 'today is holiday' });
+            }
+        }
+
+        let today_attendance_record = await attendanceService.getTodayClockInInformation(user_id, weekday);
+
+        if (today_attendance_record) {
+
+            let isTodayLeaveEarly = await attendanceService.isLeaveEarly(today_attendance_record);
+
+            let attendance_status;
+
+            if (isTodayLeaveEarly) {
+                attendance_status = config.ATTENDANCE.STATUS.ABSENCE;
             } else {
-                status = config.ATTENDANCE.STATUS.PRESENT;
+                attendance_status = config.ATTENDANCE.STATUS.PRESENT;
             }
 
             try {
-                let attendance = await attendance_record.update({
-                    clock_out_time: create_time,
-                    status: status
+                let attendance = await today_attendance_record.update({
+                    clock_out_time: current_time,
+                    status: attendance_status
                 })
 
                 attendance.dataValues.clock_in_time = moment(attendance.clock_in_time).format('YYYY-MM-DD HH:mm:ss');
                 attendance.dataValues.clock_out_time = moment(attendance.clock_out_time).format('YYYY-MM-DD HH:mm:ss');
 
-                if (attendance.status === config.ATTENDANCE.STATUS.PRESENT) {
-                    return res.status(200).json({ data: attendance, message: 'clock_out success' });
-                } else {
+                if (isTodayLeaveEarly) {
                     return res.status(200).json({ data: attendance, message: 'less than working hours, status is absence' });
+                } else {
+                    return res.status(200).json({ data: attendance, message: 'clock_out success' });
                 }
             } catch (err) {
                 return res.status(400).json({ error: `clock out failed: ${err}` });
@@ -110,7 +116,7 @@ const attendanceController = {
             try {
                 let attendance = await Attendance.create({
                     user_id: user_id,
-                    clock_in_time: create_time,
+                    clock_in_time: current_time,
                     attend_date: weekday,
                     status: config.ATTENDANCE.STATUS.INCOMPLETE
                 })
