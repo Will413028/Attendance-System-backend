@@ -85,7 +85,7 @@ const attendanceController = {
 
         if (today_attendance_record) {
 
-            let isTodayLeaveEarly = await attendanceService.isLeaveEarly(today_attendance_record);
+            let isTodayLeaveEarly = await attendanceService.isLeaveEarly(today_attendance_record, config.ATTENDANCE.WORKING_HOURS);
 
             let attendance_status;
 

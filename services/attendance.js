@@ -2,7 +2,6 @@ const db = require('../models');
 const Attendance = db.Attendance;
 const Holiday = db.Holiday;
 const moment = require('moment');
-const config = require('../config/config');
 
 async function isHoliday(date) {
     let isHoliday = await Holiday.findOne({
@@ -61,10 +60,10 @@ async function getDistance(lat1, lon1, lat2, lon2) {
     }
 }
 
-async function isLeaveEarly(weekday) {
-    let working_hours = moment().diff(weekday.clock_in_time, 'hour');
+async function isLeaveEarly(weekday, minimum_working_hours, time = moment()) {
+    let working_hours = time.diff(weekday.clock_in_time, 'hour');
 
-    if (working_hours < config.ATTENDANCE.WORKING_HOURS) {
+    if (working_hours < minimum_working_hours) {
         return true;
     } else {
         return false;
