@@ -1,5 +1,6 @@
 const db = require('../models');
 const Attendance = db.Attendance;
+const User = db.User;
 const Holiday = db.Holiday;
 const moment = require('moment');
 
@@ -33,9 +34,11 @@ async function getTodayClockInInformation(user_id, weekday) {
 async function findAll(opt = {}) {
     let attendances = await Attendance.findAll({
         where: opt,
+        include: [{
+            model: User,
+        }],
         order: [["attend_date", "DESC"]]
     })
-
     return attendances;
 }
 
