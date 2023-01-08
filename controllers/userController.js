@@ -73,29 +73,30 @@ const userController = {
 
     getUsers: async (req, res) => {
         let { user_id, attend_date, status, error_times } = req.query;
-
-        let where_conditions = {};
+        let user_where_conditions = {};
+        let att_where_conditions = {};
 
         if (user_id) {
-            where_conditions["user_id"] = user_id;
+            att_where_conditions["user_id"] = user_id;
         }
 
         if (attend_date) {
-            where_conditions["attend_date"] = attend_date;
+            att_where_conditions["attend_date"] = attend_date;
         }
 
         if (status) {
-            where_conditions["status"] = status;
+            att_where_conditions["status"] = status;
         }
 
         if (error_times) {
-            where_conditions["error_times"] = error_times;
+            user_where_conditions["error_times"] = error_times;
         }
 
         const users = await User.findAll({
+            where: user_where_conditions,
             include: {
                 model: Attendance,
-                where: where_conditions
+                where: att_where_conditions
             }
         })
 
