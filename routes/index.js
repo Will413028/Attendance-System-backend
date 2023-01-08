@@ -20,6 +20,7 @@ router.get('/createAttendanceQRcode', verifyToken, attendanceController.createAt
 router.put('/attendance/:id', verifyToken, authIsAdmin, attendanceController.updateAttendance)
 
 //holiday
-router.put('/holiday', verifyToken, holidayController.updateHolidays)
+router.post('/holiday', verifyToken, holidayController.updateHolidays)
+router.get('/holiday', verifyToken, holidayController.getHoliday)
 
 module.exports = router

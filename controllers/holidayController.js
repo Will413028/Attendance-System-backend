@@ -2,6 +2,8 @@ const db = require('../models');
 const Holidays = db.Holiday;
 const fetch = require('node-fetch');
 const config = require('../config/config');
+const Sequelize = require('sequelize');
+const moment = require('moment');
 
 const holidayController = {
     updateHolidays: async (req, res) => {
@@ -35,6 +37,23 @@ const holidayController = {
             return res.status(400).json({ error: `update holiday failed: ${error}` });
         }
         return res.status(200).json({ message: 'update holiday success' });
+    },
+    getHoliday: async (req, res) => {
+        let this_year = moment().format(`YYYY-01-01`);
+
+        const holidays = await Holidays.findAll({
+            where: {
+                date: {
+                    [Sequelize.Op.gt]: this_year
+                }
+            }
+        })
+
+        if (holidays.length > 0) {
+            return res.status(200).json(holidays);
+        } else {
+            return res.status(404).json({ message: "holiday not found" });
+        }
     }
 }
 
