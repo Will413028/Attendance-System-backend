@@ -51,6 +51,7 @@ const attendanceController = {
 
         if (req.query.timestamp) {
             user_id = req.query.user_id;
+
             latitude = req.query.latitude
             longitude = req.query.longitude
             let token = req.query.token
@@ -67,6 +68,7 @@ const attendanceController = {
                     });
                 }
             });
+            let timestamp = req.query.timestamp
             QRcodeTime = moment(timestamp).format("YYYY-MM-DD HH:mm:ss")
         } else {
             user_id = req.body.user_id;
