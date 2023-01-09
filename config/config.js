@@ -21,7 +21,7 @@ module.exports = {
     ATTENDANCE: {
         WORKING_HOURS: 8,
         TIME_POINT_OF_WEEKDAY_CHANGING: "05:00:00",
-        ENABLE_GPS_CHECK: true,
+        ENABLE_GPS_CHECK: false,
         MAXIMUM_METER_TO_CLOCK_IN: 400,
         STATUS: {
             ABSENCE: "Absent",
