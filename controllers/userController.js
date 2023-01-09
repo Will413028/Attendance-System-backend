@@ -88,17 +88,21 @@ const userController = {
             att_where_conditions["status"] = status;
         }
 
+        let users;
         if (error_times) {
             user_where_conditions["error_times"] = error_times;
+            users = await User.findAll({
+                where: user_where_conditions
+            })
+        } else {
+            users = await User.findAll({
+                where: user_where_conditions,
+                include: {
+                    model: Attendance,
+                    where: att_where_conditions
+                }
+            })
         }
-
-        const users = await User.findAll({
-            where: user_where_conditions,
-            include: {
-                model: Attendance,
-                where: att_where_conditions
-            }
-        })
 
         let res_data = {};
 

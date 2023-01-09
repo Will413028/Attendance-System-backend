@@ -10,4 +10,6 @@ EXPOSE 3000
 
 COPY . .
 
+ENV TZ=Asia/Taipei
+
 CMD npm start
