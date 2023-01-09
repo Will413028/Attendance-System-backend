@@ -1,23 +1,53 @@
 # Attendance-System-backend
 
-## Prerequest :
-docker & docker-compose
 
----
 ## How to run:
     
-    1. git clone https://github.com/Will413028/Attendance-System-backend.git
+1. Clone Project
+    ```
+    git clone https://github.com/Will413028/Attendance-System-backend.git
+    ```
+2. go to project folder
+    ``` 
+    cd Attendance-System-backend
+    ```
+    
+3. setup MySQL with docker ( Prerequest :docker )
+ 
+    ```
+    sudo docker run --restart always --name mysql-attendance-system -e MYSQL_DATABASE=attendance-system -e MYSQL_ROOT_PASSWORD=12345678 -p 3306:3306 -d mysql:5.7
+    ```
+4. Install Dependencies
+    ```
+    npm install
+    ```
 
-    2. cd Attendance-System-backend
+5. Setup .env file
+    
+    ```
+    #.env example
+    PORT=
+    JWT_SECRET=
+    DB_USERNAME=
+    DB_ROOT_PASSWORD=
+    DB_PASSWORD=
+    DB_DATABASE=
+    DB_HOST=
+    DB_PORT=
+    ```
+5. database migrate 
+    ```
+    npm run migrate
 
-    3. sudo docker-compose up -d
-
-    database migrate & seed
-        Prerequest : sequelize &sequelize-cli
-    4. npx sequelize db:migrate
-
-    5. npx sequelize db:seed:all
-
+    ```
+6.  Init seed data
+    ```
+    npm run seed
+    ```     
+7. Run project
+    ``` 
+    npm run start
+    ```
 ## test account
     1. normal user
         account: user1
@@ -27,20 +57,4 @@ docker & docker-compose
         password: tiadmin
 
 ## How to run on Debug mode:
-
-    npm install
     npm run dev
-## .env example
-    PORT=
-    JWT_SECRET=
-    DB_USERNAME=
-    DB_ROOT_PASSWORD=
-    DB_PASSWORD=
-    DB_DATABASE=
-    DB_HOST=
-    DB_PORT=
-
-How to setup MySQL without docker-compose:
-
-    docker run --restrt always --name mysql-attendance-system -e MYSQL_DATABASE=attendance-system -e MYSQL_ROOT_PASSWORD=12345678 -p 3306:3306 -d mysql:5.7
-
