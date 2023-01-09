@@ -4,6 +4,8 @@ const moment = require('moment');
 const config = require('../config/config');
 const DateUtil = require('../utils/date');
 const attendanceService = require('../services/attendance');
+const jwt = require("jsonwebtoken");
+require('dotenv').config();
 
 const attendanceController = {
     getAttendance: async (req, res) => {
@@ -44,16 +46,32 @@ const attendanceController = {
     },
 
     createAttendance: async (req, res) => {
-        let { latitude, longitude } = req.body;
-
-        let user_id;
-
         let current_time = moment().format('YYYY-MM-DD HH:mm:ss');
+        let latitude, longitude, user_id, QRcodeTime;
 
-        if (req.body.user_id) {
-            user_id = req.body.user_id
-        } else if (req.query.user_id) {
-            user_id = req.query.user_id
+        if (req.query.timestamp) {
+            user_id = req.query.user_id;
+            latitude = req.query.latitude
+            longitude = req.query.longitude
+            let token = req.query.token
+            if (!token) {
+                return res.status(401).json({
+                    message: "No token provided!"
+                });
+            }
+
+            jwt.verify(token, process.env.JWT_SECRET, (err) => {
+                if (err) {
+                    return res.status(401).json({
+                        message: "Unauthorized!"
+                    });
+                }
+            });
+            QRcodeTime = moment(timestamp).format("YYYY-MM-DD HH:mm:ss")
+        } else {
+            user_id = req.body.user_id;
+            latitude = req.body.latitude
+            longitude = req.body.longitude
         }
 
         if (!user_id) {
@@ -72,10 +90,20 @@ const attendanceController = {
             }
         }
 
-        let weekday = await DateUtil.getWeekday(config.ATTENDANCE.TIME_POINT_OF_WEEKDAY_CHANGING);
+        let time_point_changing = config.ATTENDANCE.TIME_POINT_OF_WEEKDAY_CHANGING
+        let weekday;
+
+        if (QRcodeTime) {
+            weekday = await DateUtil.getWeekday(time_point_changing, QRcodeTime);
+            if (weekday !== DateUtil.getWeekday(time_point_changing)) {
+                return res.status(400).json({ message: 'QRcode is invaild' });
+            }
+        } else {
+            weekday = await DateUtil.getWeekday(time_point_changing);
+        }
 
         if (config.HOLIDAY.ENABLE) {
-            let weekdayIsHoliday = attendanceService.isHoliday(weekday);
+            let weekdayIsHoliday = await attendanceService.isHoliday(weekday);
             if (weekdayIsHoliday) {
                 return res.status(400).json({ message: 'today is holiday' });
             }
