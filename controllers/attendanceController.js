@@ -47,9 +47,9 @@ const attendanceController = {
 
     createAttendance: async (req, res) => {
         let current_time = moment().format('YYYY-MM-DD HH:mm:ss');
-        let latitude, longitude, user_id, QRcodeTime;
+        let latitude, longitude, user_id;
 
-        if (req.query.timestamp) {
+        if (req.query.date) {
             user_id = req.query.user_id;
 
             latitude = req.query.latitude
@@ -68,8 +68,6 @@ const attendanceController = {
                     });
                 }
             });
-            let timestamp = req.query.timestamp
-            QRcodeTime = moment(timestamp).format("YYYY-MM-DD HH:mm:ss")
         } else {
             user_id = req.body.user_id;
             latitude = req.body.latitude
@@ -95,9 +93,12 @@ const attendanceController = {
         let time_point_changing = config.ATTENDANCE.TIME_POINT_OF_WEEKDAY_CHANGING
         let weekday;
 
-        if (QRcodeTime) {
-            weekday = await DateUtil.getWeekday(time_point_changing, QRcodeTime);
-            if (weekday !== DateUtil.getWeekday(time_point_changing)) {
+        if (req.query.date) {
+            let date = req.query.date;
+            let QRcodeTime = await DateUtil.getWeekday(time_point_changing, date);
+            weekday = await DateUtil.getWeekday(time_point_changing);
+
+            if (QRcodeTime !== weekday) {
                 return res.status(400).json({ message: 'QRcode is invaild' });
             }
         } else {
