@@ -38,7 +38,6 @@
 5. database migrate 
     ```
     npm run migrate
-
     ```
 6.  Init seed data
     ```
@@ -52,9 +51,13 @@
     1. normal user
         account: user1
         password: titaner
-    2. adimn user
+    2. admin user
         account: admin
         password: tiadmin
 
 ## How to run on Debug mode:
+    
     npm run dev
+
+## Database Design
+https://dbdiagram.io/d/639a979599cb1f3b55a1810b
