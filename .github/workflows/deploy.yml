@@ -29,3 +29,14 @@ jobs:
         with:
           push: true
           tags: will413028/attendance-system-backend:latest
+          
+      - 
+        name: Heroku
+        uses: actions/checkout@v2
+      - 
+        name: Heroku Push
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "fast-gorge-70763"
+          heroku_email: "will413028@gmail.com"
