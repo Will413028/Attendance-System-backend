@@ -21,7 +21,7 @@ module.exports = {
     ATTENDANCE: {
         WORKING_HOURS: 8,
         TIME_POINT_OF_WEEKDAY_CHANGING: "05:00:00",
-        ENABLE_GPS_CHECK: false,
+        ENABLE_GPS_CHECK: true,
         MAXIMUM_METER_TO_CLOCK_IN: 400,
         STATUS: {
             ABSENCE: "Absent",
@@ -41,7 +41,7 @@ module.exports = {
     },
     COMPANY: {
         NAME: "test_company",
-        LATITUDE: 25.072636,
-        LONGITUDE: 121.372498,
+        LATITUDE: process.env.DB_PORT,
+        LONGITUDE: process.env.DB_PORT
     }
 }
