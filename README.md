@@ -4,6 +4,32 @@
 
 https://attendance-system.onrender.com
 
+## Features
+- ### Database: using MySQL
+- ### Authentication: using jsonwebtoken
+- ### Testing: unit tests using Mocha
+- ### Environment variables: using dotenv
+- ### CI/CD: using GitHub Action and Heroku
+
+## API Endpoints
+List of available routes:
+
+**Auth routes**:\
+`POST /login` - login
+
+**User routes**:\
+`GET /user` - get all users\
+`PUT /user/:id` - update user
+
+**Attendance routes**:\
+`GET /attendance` - get all attendance\
+`POST /attendance` - create an attendance\
+`PUT /attendance/:id` - update attendance
+
+**Holiday routes**:\
+`POST /holiday` - create holiday\
+`GET /holiday` - get all holiday
+
 ## How to run:
     
 1. Clone Project
