@@ -41,7 +41,7 @@ module.exports = {
     },
     COMPANY: {
         NAME: "test_company",
-        LATITUDE: process.env.DB_PORT,
-        LONGITUDE: process.env.DB_PORT
+        LATITUDE: process.env.LATITUDE,
+        LONGITUDE: process.env.LONGITUDE
     }
 }

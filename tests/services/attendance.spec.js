@@ -19,7 +19,7 @@ describe('# attendance services', () => {
 
   context('check isLeaveEarly() if working hours less than the minimum working hours', () => {
 
-    it('The result should be false', async () => {
+    it('The result should be true', async () => {
       let isLeaveEarly = await attendanceService.isLeaveEarly(attendance_record, 8, moment("2022-12-14 17:59:59"));
 
       assert.equal(isLeaveEarly, true);
