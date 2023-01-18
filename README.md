@@ -18,17 +18,18 @@ List of available routes:
 `POST /login` - login
 
 **User routes**:\
-`GET /user` - get all users\
-`PUT /user/:id` - update user
+`GET /users` - get all users\
+`PUT /users/:id` - update user
 
 **Attendance routes**:\
-`GET /attendance` - get all attendance\
-`POST /attendance` - create an attendance\
-`PUT /attendance/:id` - update attendance
+`GET /attendances` - get all attendance\
+`POST /attendances` - create an attendance\
+`PUT /attendances/:id` - update attendance\
+`GET /attendanceQRcode` - get attendance QRcode
 
 **Holiday routes**:\
-`POST /holiday` - create holiday\
-`GET /holiday` - get all holiday
+`POST /holidays` - create holiday\
+`GET /holidays` - get all holiday
 
 ## How to run:
     
