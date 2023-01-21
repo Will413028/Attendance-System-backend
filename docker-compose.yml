@@ -1,0 +1,19 @@
+version: "3.5"
+services:
+    mysql:
+        container_name: mysql
+        image: mysql
+        ports:
+            - "3306:3306"
+        command:
+            [
+                "--character-set-server=utf8mb4",
+                "--collation-server=utf8mb4_unicode_ci",
+                "--sql_mode=STRICT_TRANS_TABLES,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+            ]
+        environment:
+            - MYSQL_RANDOM_ROOT_PASSWORD=yes
+            - MYSQL_USER=myuser
+            - MYSQL_PASSWORD=12345678
+            - MYSQL_DATABASE=attendance-system
+        restart: always
